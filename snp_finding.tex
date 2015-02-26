@@ -111,11 +111,11 @@ We will begin by accessing the data to use in the tutorial.
           Libraries'. Click on 'Data Libraries'.
 	\item In the list of Data Libraries you will see one called
           'tsl training'. Click on this and you will see a couple of
-          subfolders. Next to the folder 'SNP detection' click on the
+          subfolders. Next to the folder 'SNP Training 2015' click on the
           blue arrow-head and check the boxes next to
-          '\emph{Solanum}\_reference.fasta', 'BR\_left.fastqsanger',
-          'BR\_right.fastqsanger', 'BS\_left.fastqsanger' and\\
-          'BS\_right.fastqsanger'. Make sure 'Import to current
+          'reference.fasta', 'BR\_1.fastqsanger',
+          'BR\_2.fastqsanger', 'BS\_1.fastqsanger' and\\
+          'BS\_2.fastqsanger'. Make sure 'Import to current
           history' is selected in the box below and click on
           'Go'. Click on 'Analyze Data' in the menu to return to the
           main interface.
@@ -123,31 +123,31 @@ We will begin by accessing the data to use in the tutorial.
           see the four fastq files and one fasta file in your history.
 \end{enumerate}
 
-\subsection{Quality Control}
+% \subsection{Quality Control}
 
-Illumina sequencing is not 100\% accurate. Errors are introduced
-during sequencing and base-calling have a degree of uncertainty, which
-is encoded in the fastq quality scores.  \\
+% Illumina sequencing is not 100\% accurate. Errors are introduced
+% during sequencing and base-calling have a degree of uncertainty, which
+% is encoded in the fastq quality scores.  \\
 
-Quality controlling (QC) reads involves a number of steps: joining
-paired-end sequences together, removing sequences with N's, removing
-sequences that are not exactly twice the length of a single-end read,
-examining the per-base quality of the reads and trimming or removing
-reads that have low quality scores. Time spent making sure you have
-good quality data at the start of your experiments will be time saved
-at the end, filtering out spurious results that are caused by
-low-quality reads.  \\ 
+% Quality controlling (QC) reads involves a number of steps: joining
+% paired-end sequences together, removing sequences with N's, removing
+% sequences that are not exactly twice the length of a single-end read,
+% examining the per-base quality of the reads and trimming or removing
+% reads that have low quality scores. Time spent making sure you have
+% good quality data at the start of your experiments will be time saved
+% at the end, filtering out spurious results that are caused by
+% low-quality reads.  \\ 
 
-There are a number of ready-made workflows for quality controlling in
-Galaxy. If you would like to use them, just contact me and I will put
-you on the right track.\\ 
+% There are a number of ready-made workflows for quality controlling in
+% Galaxy. If you would like to use them, just contact me and I will put
+% you on the right track.\\ 
 
-The data we are using today has already been quality controlled so
-there is no need to carry out these steps.
+% The data we are using today has already been quality controlled so
+% there is no need to carry out these steps.
 
 \section{Mapping with BWA}
 
-We will now map our Illumina reads to the \emph{Solanum} reference
+We will map our Illumina reads to the \emph{Solanum} reference
 sequence using the BWA next-generation sequence aligner.
 
 \subsection{BWA}
@@ -180,8 +180,8 @@ very fast.
           want to map each set separately in order to compare them
           later so we'll start by mapping the BS reads first. For the
           'Forward FASTQ file:' select your left-hand reads file
-          (BS\_left.fastqsanger in this case) and then the right-hand
-          reads (BS\_right.fastqsanger) for the 'Reverse FASTQ file:'.
+          (BS\_1.fastqsanger in this case) and then the right-hand
+          reads (BS\_2.fastqsanger) for the 'Reverse FASTQ file:'.
 
 	\item Next we will look at the BWA advanced settings. Click on
           the 'BWA settings to use' list and change it from 'Commonly
@@ -229,39 +229,44 @@ and position of nucleotides that match to the genome and the position
 of indels. We can use the SAM file to take a closer look at our
 alignment.\\
 
-Click on the output 'Map with BWA for Illumina...' file and view the
-SAM format output file. The first few lines start with '@SQ SN'
-followed by the name of the sequences in the reference file
-(chromosome names in this case) and the length of the sequence. Then
-there will be a line beginning with '@PG'. Because the SAM format is
-generic, it is used by a number of different next-gen sequence
-aligners. The @PG line gives us information about the program name
-(PN) used to produce the alignment and what version (VN) was used.\\ 
+\begin{enumerate}
+  \item Click on the output 'Map with BWA for Illumina...' file and view the
+SAM format output file. \\
 
-Every line after that corresponds to each read that BWA
-handled. Each line starts with the name of the read and has a number
-of columns of data after it. In the 3rd column we can see which
-chromosome our read has been mapped to and the position of the first
-mapped base in column 4. An unmapped read will have a * in column 3
-and zero in column 4. The 5th column is the mapping quality, a score
-quantifying the probability that a read is misplaced. The next column
-is the CIGAR string and consists of numbers followed by an upper-case
-letter (the operator). Many of the CIGAR strings will read '76M'. This
-means that in the current alignment of the read against the reference,
-all 76 nucleotides of the read match (M) the reference. Some other
-operators we might find in the CIGAR string are 'I' meaning an
-insertion to the reference, 'D' meaning a deletion from the reference
-and 'S' meaning soft-clipping, where part of the read, usually at the
-start or end of the alignment, does not match the reference. \\
+  The first few lines start with '@SQ SN' followed by the name of the
+  sequences in the reference file (chromosome names in this case) and
+  the length of the sequence. Then there will be a line beginning with
+  '@PG'. Because the SAM format is generic, it is used by a number of
+  different next-gen sequence aligners. The @PG line gives us
+  information about the program name (PN) used to produce the
+  alignment and what version (VN) was used.\\
 
-As an example, a CIGAR string of 36M3D40M means 36 matching
-nucleotides, followed by 3 deletions and ending in 40 matches.  \\
+  Every line after that corresponds to each read that BWA
+  handled. Each line starts with the name of the read and has a number
+  of columns of data after it. In the 3rd column we can see which
+  chromosome our read has been mapped to and the position of the first
+  mapped base in column 4. An unmapped read will have a * in column 3
+  and zero in column 4. The 5th column is the mapping quality, a score
+  quantifying the probability that a read is misplaced. The next
+  column is the CIGAR string and consists of numbers followed by an
+  upper-case letter (the operator). Many of the CIGAR strings will
+  read '76M'. This means that in the current alignment of the read
+  against the reference, all 76 nucleotides of the read match (M) the
+  reference. Some other operators we might find in the CIGAR string
+  are 'I' meaning an insertion to the reference, 'D' meaning a
+  deletion from the reference and 'S' meaning soft-clipping, where
+  part of the read, usually at the start or end of the alignment, does
+  not match the reference. \\
 
-Take a look at the CIGAR strings in the SAM file. What combinations
-of CIGAR string can you find? Compare the mapping quality values of
-reads that have a CIGAR string of 76M to those that have a different
-combination - what do you notice about the mapping qualities?  \\
+  As an example, a CIGAR string of 36M3D40M means 36 matching
+  nucleotides, followed by 3 deletions and ending in 40 matches.  \\
 
+  \item Take a look at the CIGAR strings in the SAM file. What
+    combinations of CIGAR string can you find? Compare the mapping
+    quality values of reads that have a CIGAR string of 76M to those
+    that have a different combination - what do you notice about the
+    mapping qualities?  \\
+\end{enumerate}
 More information on the SAM format can be found via the following
 link: \\
 
@@ -356,9 +361,11 @@ bases, and base qualities.  \\
           (the true hit is more likely to be missed by an algorithm
           with low sensitivity, which also causes mapping errors) and
           whether the read is paired end or not (reads mapped in pairs
-          are more likely to be correct). Once you're satisfied that
-          you have the correct parameters set (just use the default
-          parameters here), hit 'Execute'.
+          are more likely to be correct). \\
+
+          If you're satisfied that you have the correct parameters
+          set (just use the default parameters here), hit 'Execute'.
+
 	\item Once the history item has turned green, click on the eye
           symbol to display the first few hundred lines of the
           Mpileup. We can see 9 columns. The first 3 columns represent
@@ -416,10 +423,11 @@ are considered.
           Fisher's Exact Test on the read counts supporting reference
           and variant alleles. Using the 'Strand filter' tells VarScan
           to ignore variant calls where 90\% of the variant bases are
-          on one strand. VarScan can output 2 types of format: basic
-          tab-delimited results, or VCF format. We want our output in
-          VCF format, so make sure 'Output VCF format' is checked and
-          hit 'Execute'.
+          on one strand. This allows us to avoid certain sequencing
+          errors.
+          VarScan can output 2 types of format: basic tab-delimited
+          results, or VCF format. We want our output in VCF format, so
+          make sure 'Output VCF format' is checked and hit 'Execute'.
 \end{enumerate}
 
 \subsection{VCF format}
@@ -492,8 +500,8 @@ The full specifications of VCF can be found here:
 \subsection{Filtering the VCF data}
 
 Now that we understand what the data in our VCF file means, we can try
-and filter it to get at what we're really interested in. In todays
-experiment we're going to say that our BS sample should be homozygous
+and filter it to get at what we're really interested in. In today's
+experiment we are going to say that our BS sample should be homozygous
 to the reference (so have a genotype of 0/0) and BR should be
 heterozygous (0/1). As that information is in the VCF file, we'll use
 a custom filter to extract the positions that match the required
@@ -638,12 +646,12 @@ we found during our experiment.
         \item Go back to the Galaxy home page and have a look at your
           history. We want to visualise our read alignments (the two
           BAM files, we created earlier) to the reference, as well as
-          our annotated SNPs and indels (the two bed files).  For that
-          we need to associate the respective files with the reference
-          sequence. In the history, you will see the attribute
-          'database: ?' for each file, click the '?' and choose your
-          newly created custom build from the 'Database/Build' list.
-	\item Now click on Visualization > New Track Browser again.
+          our annotated SNPs and indels (the two bed files).  %For that
+          %we need to associate the respective files with the reference
+          %sequence. In the history, you will see the attribute
+          %'database: ?' for each file, click the '?' and choose your
+          %newly created custom build from the 'Database/Build' list.
+	\item Click on Visualization > New Track Browser again.
 	\item Give your visualisation browser a name, e.g. 'Solanum
           browser' and select your new build from the 'Reference
           genome build (dbkey):' drop-down list.
@@ -654,14 +662,14 @@ we found during our experiment.
           appear. The data we want to look at is in our history, so
           click on the grey 'Histories' tab and then click on the name
           of your current history. You will see all the data in the
-          current history that can be viewed in Trackster. %We want to
-          %look at our sequence alignments, our snp annotations and our
-          %indel annotations. To load the sequence alignments, check
-          %the boxes next to the two BAM files that we created
-          %earlier. The snp annotation file is the .bed file that we
-          %created with the Genotype filter tool and the indel
-          %annotation file is the bed file we created with the VarScan
-          %vcf2bed tool. Check these two files and then click on 'Add'.
+          current history that can be viewed in Trackster. We want to
+          look at our sequence alignments, our snp annotations and our
+          indel annotations. To load the sequence alignments, check
+          the boxes next to the two BAM files that we created
+          earlier. The snp annotation file is the .bed file that we
+          created with the Genotype filter tool and the indel
+          annotation file is the bed file we created with the VarScan
+          vcf2bed tool. Check these two files and then click on 'Add'.
           Check all items and then click on 'Add'. 
 	\item The genome browser will reappear. At the top of the page
           there is a drop-down list called 'Select
@@ -717,11 +725,11 @@ we found during our experiment.
 
 \section{Summary}
 
-This tutorial has shown you how to take your reads, align them to a
-reference, extract SNPs and indels, and view them in a genome
-browser. You have managed to take the \emph{Solanum} reference which has
-9335 nucleotides and reduce it down to a list of just a few positions
-of interest.
+This tutorial has shown you how to align your reads to a reference,
+extract SNPs and indels, and view them in a genome browser. You have
+managed to take the \emph{Solanum} reference which has 9335
+nucleotides and reduce it down to a list of just a few positions of
+interest.
 
 \section{Parameters}
 
